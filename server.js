@@ -1128,23 +1128,27 @@ app.use('/api', (req, res) => {
   res.status(404).json({ message: 'API endpoint not found' });
 });
 
-// Global error handler
 app.use((error, req, res, next) => {
   console.error('Global error:', error);
   res.status(500).json({ message: 'Internal server error' });
 });
 
-// Start Server
+// Export the Express app for serverless functions
+module.exports = app;
 
-const PORT = process.env.PORT || 5000;
+// Only start the server if not in a serverless environment
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
 
-// Only listen locally, Vercel will handle the serverless function
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
-    console.log(`🔐 Auth routes: http://localhost:${PORT}/api/auth`);
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log('=================================');
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log('=================================');
+      console.log('📝 Migration: POST /api/migrate/fix-user-roles');
+      console.log('👤 Client: POST /api/auth/signup');
+      console.log('🛡️  Admin: POST /api/auth/admin/signup (requires ADMIN_SECRET)');
+      console.log('=================================');
+    });
   });
 }
-
-export default app;
