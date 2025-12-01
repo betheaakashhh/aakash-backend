@@ -18,18 +18,24 @@ console.log('PORT:', process.env.PORT || 5000);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Replace your existing CORS configuration with this:
+
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173', 
   'http://localhost:5174',
   'http://localhost:3001',
+  'https://aakashkumarsahu.vercel.app', // ✅ Add your frontend URL
+  'https://aakashkumarsahu.vercel.app/', // with trailing slash
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
+    
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -42,6 +48,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
+// Handle preflight requests
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
     res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
