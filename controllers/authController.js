@@ -117,38 +117,55 @@ const adminSignup = async (req, res) => {
 
 // Universal Login
 const login = async (req, res) => {
-  try {
-    console.log('🔐 Login request:', req.body.email);
+ try {
+    console.log('🔐 LOGIN ATTEMPT - START');
+    console.log('📦 Request body:', req.body);
+    console.log('📦 Email:', req.body.email);
+    
     const { email, password } = req.body;
 
     if (!email || !password) {
+      console.log('❌ Missing email or password');
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
+    console.log('🔍 Looking for user in database...');
     const user = await User.findOne({ email });
+    
     if (!user) {
+      console.log('❌ User not found:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+    
+    console.log('✅ User found:', user.email);
+    console.log('🔍 User role:', user.role);
+    console.log('🔍 Checking password...');
 
     const isValidPassword = await bcrypt.compare(password, user.password);
+    
     if (!isValidPassword) {
+      console.log('❌ Invalid password for user:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    console.log('✅ Password valid');
+    
+    // Fix role if missing
     if (!user.role) {
-      console.log('⚠️ User missing role, setting to client:', user.email);
+      console.log('⚠️ User missing role, setting to client');
       user.role = 'client';
       await user.save();
     }
 
-    console.log('✅ Login successful:', user.email, 'Role:', user.role);
-
+    console.log('🎫 Generating JWT token...');
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       JWT_SECRET,
-      { expiresIn: JWT_EXPIRY }
+      { expiresIn: '7d' }
     );
 
+    console.log('✅ Login successful for:', user.email);
+    
     res.json({
       message: 'Login successful',
       token,
@@ -159,12 +176,19 @@ const login = async (req, res) => {
         role: user.role
       }
     });
+    
   } catch (error) {
-    console.error('❌ Login error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
+    console.error('❌ LOGIN ERROR DETAILS:', error);
+    console.error('❌ Error stack:', error.stack);
+    console.error('❌ Error message:', error.message);
+    
+    res.status(500).json({ 
+      message: 'Server error',
+      error: error.message, // Add this for debugging
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
 };
-
+};
 // Get User Profile
 const getProfile = async (req, res) => {
   try {
