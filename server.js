@@ -1178,11 +1178,8 @@ app.use((error, req, res, next) => {
 
 
 module.exports = app;
-
-// Local environment only
-if (require.main === module) {
-  const PORT = process.env.PORT || 5000;
-   app.listen(PORT, () => {
+if (process.env.NODE_ENV !== 'production') {
+ app.listen(PORT, () => {
       console.log('=================================');
       console.log(`🚀 Server running on port ${PORT}`);
       console.log('=================================');
@@ -1191,4 +1188,7 @@ if (require.main === module) {
       console.log('🛡️  Admin: POST /api/auth/admin/signup (requires ADMIN_SECRET)');
       console.log('=================================');
     });
-  }
+}
+
+export default app;
+
