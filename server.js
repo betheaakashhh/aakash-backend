@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
-connectDB();
+
 
 // Debug: Check environment variables
 console.log('Environment check:');
@@ -76,6 +76,7 @@ const connectDB = async () => {
   }
 };
 
+connectDB();
 // User Schema with role field
 const userSchema = new mongoose.Schema({
   name: {
