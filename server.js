@@ -1177,7 +1177,7 @@ app.use((error, req, res, next) => {
 
 
 
-module.exports = app;
+
 if (process.env.NODE_ENV !== 'production') {
  app.listen(PORT, () => {
       console.log('=================================');
