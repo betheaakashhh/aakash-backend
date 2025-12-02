@@ -112,27 +112,38 @@ app.use((error, req, res, next) => {
 
 // ==================== VERCEL COMPATIBLE SERVER START ====================
 // Start server locally (for development) if not on Vercel
-if (process.env.VERCEL !== '1') {
-  const server = app.listen(PORT, 'localhost', () => {
+// if (process.env.VERCEL !== '1') {
+//   const server = app.listen(PORT, 'localhost', () => {
+//     console.log('=================================');
+//     console.log(`✅ Server running on http://localhost:${PORT}`);
+//     console.log(`📊 Environment: ${config.nodeEnv}`);
+//     console.log('=================================');
+//     console.log('📝 Migration: POST /api/migrate/fix-user-roles');
+//     console.log('👤 Client: POST /api/auth/signup');
+//     console.log('🛡️  Admin: POST /api/auth/admin/signup');
+//     console.log('=================================');
+//   });
+
+//   // Handle server errors
+//   server.on('error', (error) => {
+//     if (error.code === 'EADDRINUSE') {
+//       console.error(`❌ Port ${PORT} is already in use`);
+//       console.log(`Try: PORT=${Number(PORT) + 1} npm start`);
+//     } else {
+//       console.error('❌ Server error:', error.message);
+//     }
+//     process.exit(1);
+//   });
+// }
+if (config.nodeEnv !== 'production') {
+  app.listen(PORT, () => {
     console.log('=================================');
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-    console.log(`📊 Environment: ${config.nodeEnv}`);
+    console.log(`🚀 Server running on port ${PORT}`);
     console.log('=================================');
     console.log('📝 Migration: POST /api/migrate/fix-user-roles');
     console.log('👤 Client: POST /api/auth/signup');
-    console.log('🛡️  Admin: POST /api/auth/admin/signup');
+    console.log('🛡️  Admin: POST /api/auth/admin/signup (requires ADMIN_SECRET)');
     console.log('=================================');
-  });
-
-  // Handle server errors
-  server.on('error', (error) => {
-    if (error.code === 'EADDRINUSE') {
-      console.error(`❌ Port ${PORT} is already in use`);
-      console.log(`Try: PORT=${Number(PORT) + 1} npm start`);
-    } else {
-      console.error('❌ Server error:', error.message);
-    }
-    process.exit(1);
   });
 }
 
