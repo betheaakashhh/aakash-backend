@@ -1,63 +1,49 @@
-// server.js (simplified version)
 import express from 'express';
 import mongoose from 'mongoose';
 import { config } from './config/env.js';
 import connectDB from './config/db.js';
 import { corsConfig, handlePreflight } from './middleware/corsConfig.js';
-import router from './routes/router.js';  // Import the central router
+import router from './routes/router.js';
 
 const app = express();
-const PORT = config.port || 5000;
+const PORT = process.env.PORT || config.port || 5000;
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// ==================== MIDDLEWARE ====================
 app.use(corsConfig);
 app.use(handlePreflight);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
+// ==================== DB CONNECTION ====================
 connectDB();
 
 // ==================== ROOT ROUTE ====================
-router.get('/', (req, res) => {
-  res.json({ 
-    message: 'Portfolio API is running',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    deployment: 'Vercel + Local Compatible'
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Portfolio API is live 🎯',
+    time: new Date().toISOString(),
+    server: 'Render Deployment',
+    mongoose: mongoose.version
   });
 });
-// ==================== USE CENTRAL ROUTER ====================
+
+// ==================== API ROUTES ====================
 app.use('/api', router);
 
 // ==================== GLOBAL ERROR HANDLER ====================
 app.use((error, req, res, next) => {
   console.error('Global error:', error);
-  res.status(500).json({ message: 'Internal server error' });
+  res.status(500).json({ error: 'Internal Server Error' });
 });
 
-// ==================== VERCEL COMPATIBLE SERVER START ====================
-if (process.env.VERCEL !== '1') {
-  const server = app.listen(PORT, 'localhost', () => {
-    console.log('=================================');
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-    console.log(`📊 Environment: ${config.nodeEnv}`);
-    console.log('=================================');
-    console.log('📝 Migration: POST /api/migrate/fix-user-roles');
-    console.log('👤 Client: POST /api/auth/signup');
-    console.log('🛡️  Admin: POST /api/auth/admin/signup');
-    console.log('=================================');
-  });
-
-  server.on('error', (error) => {
-    if (error.code === 'EADDRINUSE') {
-      console.error(`❌ Port ${PORT} is already in use`);
-      console.log(`Try: PORT=${Number(PORT) + 1} npm start`);
-    } else {
-      console.error('❌ Server error:', error.message);
-    }
-    process.exit(1);
-  });
-}
+// ==================== START SERVER ====================
+app.listen(PORT, () => {
+  console.log('=================================');
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌍 http://localhost:${PORT}`);
+  console.log(`🔗 Environment: ${config.nodeEnv}`);
+  console.log(`🐬 Mongoose: ${mongoose.version}`);
+  console.log('=================================');
+});
 
 export default app;
