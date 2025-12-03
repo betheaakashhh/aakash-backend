@@ -8,14 +8,7 @@ import migrationRoutes from './migration.js';
 const router = express.Router();
 
 // ==================== HEALTH & ROOT ROUTES ====================
-router.get('/', (req, res) => {
-  res.json({ 
-    message: 'Portfolio API is running',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    deployment: 'Vercel + Local Compatible'
-  });
-});
+
 
 router.get('/health', (req, res) => {
   const healthData = {
