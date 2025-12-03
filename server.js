@@ -18,6 +18,15 @@ app.use(handlePreflight);
 // Connect to MongoDB
 connectDB();
 
+// ==================== ROOT ROUTE ====================
+router.get('/', (req, res) => {
+  res.json({ 
+    message: 'Portfolio API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    deployment: 'Vercel + Local Compatible'
+  });
+});
 // ==================== USE CENTRAL ROUTER ====================
 app.use('/api', router);
 
